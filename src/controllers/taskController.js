@@ -13,15 +13,16 @@ export const getTasks = async (req, res) => {
 
 export const deleteTask = async (req, res) => {
   try {
-    const { id } = req.params; // 從請求參數中取得 task 的 ID
-    const task = await Task.findOneAndDelete({ _id: id, user: req.user.id });
+    const { id } = req.params;
+    const task = await Task.findOne({ _id: id, user: req.user.id }); // 確保該任務屬於使用者
 
     if (!task) {
       return res.status(404).json({ message: "Task not found or unauthorized" });
     }
 
-    res.status(200).json({ message: "Task deleted successfully", task });
+    await task.deleteOne();
+    res.status(200).json({ message: "Task deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting task", error: error.message });
+    res.status(500).json({ message: "Server error", error });
   }
 };

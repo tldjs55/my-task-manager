@@ -152,6 +152,7 @@
           tasks.forEach((task) => {
             const taskDiv = document.createElement("div");
             taskDiv.className = "task-item";
+            // taskId 綁定刪除按鈕
             taskDiv.innerHTML = `
               <strong>${task.title}</strong>
               <button onclick="deleteTask('${task._id}')">Delete</button>
