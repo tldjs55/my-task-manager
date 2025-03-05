@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Task Manager Test with Auth</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+      }
+      .task-list {
+        margin-top: 20px;
+      }
+      .task-item {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+      }
+      input,
+      button {
+        margin: 5px;
+        padding: 5px;
+      }
+      .auth-container {
+        margin-bottom: 20px;
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Task Manager Test</h1>
+
+    <!-- 登入/註冊表單 -->
+    <div id="authContainer" class="auth-container">
+      <div id="loginForm">
+        <h2>Login</h2>
+        <input type="email" id="loginEmail" placeholder="Email" />
+        <input type="password" id="loginPassword" placeholder="Password" />
+        <button onclick="login()">Login</button>
+        <button onclick="showRegister()">Go to Register</button>
+      </div>
+
+      <div id="registerForm" class="hidden">
+        <h2>Register</h2>
+        <input type="text" id="registerUsername" placeholder="Username" />
+        <input type="email" id="registerEmail" placeholder="Email" />
+        <input type="password" id="registerPassword" placeholder="Password" />
+        <button onclick="register()">Register</button>
+        <button onclick="showLogin()">Go to Login</button>
+      </div>
+    </div>
+
+    <!-- 任務管理（登入後顯示） -->
+    <div id="taskContainer" class="hidden">
+      <button onclick="logout()">Logout</button>
+      <div>
+        <input type="text" id="taskTitle" placeholder="Task title" />
+        <button onclick="createTask()">Add Task</button>
+      </div>
+      <div id="taskList" class="task-list"></div>
+    </div>
+
+    <script>
+      const API_URL = "http://localhost:3000";
+      let token = null;
+
+      // 切換表單顯示
+      function showRegister() {
+        document.getElementById("loginForm").classList.add("hidden");
+        document.getElementById("registerForm").classList.remove("hidden");
+      }
+
+      function showLogin() {
+        document.getElementById("registerForm").classList.add("hidden");
+        document.getElementById("loginForm").classList.remove("hidden");
+      }
+
+      // 註冊
+      async function register() {
+        const username = document.getElementById("registerUsername").value;
+        const email = document.getElementById("registerEmail").value;
+        const password = document.getElementById("registerPassword").value;
+
+        try {
+          const response = await fetch(`${API_URL}/api/auth/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, email, password }),
+          });
+          const data = await response.json();
+          if (response.ok) {
+            alert("Registration successful! Please login.");
+            showLogin();
+          } else {
+            alert(`Registration failed: ${data.error || "Unknown error"}`);
+          }
+        } catch (error) {
+          console.error("Registration error:", error);
+          alert("Registration failed due to network error");
+        }
+      }
+
+      // 登入
+      async function login() {
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPassword").value;
+
+        try {
+          const response = await fetch(`${API_URL}/api/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+          const data = await response.json();
+          if (response.ok && data.token) {
+            token = data.token;
+            document.getElementById("authContainer").classList.add("hidden");
+            document.getElementById("taskContainer").classList.remove("hidden");
+            loadTasks();
+          } else {
+            alert(`Login failed: ${data.error || "Unknown error"}`);
+          }
+        } catch (error) {
+          console.error("Login error:", error);
+          alert("Login failed due to network error");
+        }
+      }
+
+      // 登出
+      function logout() {
+        token = null;
+        document.getElementById("taskContainer").classList.add("hidden");
+        document.getElementById("authContainer").classList.remove("hidden");
+        document.getElementById("taskList").innerHTML = "";
+      }
+
+      // 獲取任務
+      async function loadTasks() {
+        try {
+          const response = await fetch(`${API_URL}/api/tasks`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const tasks = await response.json();
+          const taskList = document.getElementById("taskList");
+          taskList.innerHTML = "";
+
+          tasks.forEach((task) => {
+            const taskDiv = document.createElement("div");
+            taskDiv.className = "task-item";
+            taskDiv.innerHTML = `
+                        <strong>${task.title}</strong>
+                    `;
+            taskList.appendChild(taskDiv);
+          });
+        } catch (error) {
+          console.error("Error loading tasks:", error);
+        }
+      }
+
+      // 建立任務
+      async function createTask() {
+        const title = document.getElementById("taskTitle").value;
+
+        try {
+          await fetch(`${API_URL}/api/tasks`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ title }),
+          });
+          document.getElementById("taskTitle").value = "";
+          loadTasks();
+        } catch (error) {
+          console.error("Error creating task:", error);
+        }
+      }
+    </script>
+  </body>
+</html>
