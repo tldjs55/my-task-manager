@@ -1,8 +1,25 @@
 import Task from "../models/Task.js";
 
 export const createTask = async (req, res) => {
-  const task = await Task.create({ ...req.body, user: req.user.id });
-  res.status(201).json(task);
+  try {
+    // 手動從 req.body 取出必要的欄位，避免不必要的資料進入
+    const { title, completed } = req.body;
+
+    if (!title) {
+      return res.status(400).json({ message: "Title is required" });
+    }
+
+    // 建立 Task，並指定 user
+    const task = await Task.create({
+      title,
+      completed: completed || false, // 預設值為 false
+      user: req.user.id, // 確保任務關聯到當前使用者
+    });
+    
+    res.status(201).json(task);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
 };
 
 export const getTasks = async (req, res) => {
