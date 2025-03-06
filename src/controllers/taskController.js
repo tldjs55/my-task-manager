@@ -24,7 +24,6 @@ export const createTask = async (req, res) => {
 
 export const getTasks = async (req, res) => {
   const tasks = await Task.find({ user: req.user.id });
-  console.log(tasks);
   res.json(tasks);
 };
 
@@ -44,7 +43,7 @@ export const updateTask = async (req, res) => {
 export const deleteTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const task = await Task.findOne({ _id: id, user: req.user.id }); // 確保該任務屬於使用者
+    const task = await Task.findOne({ _id: id, user: req.user.id });
 
     if (!task) {
       return res
