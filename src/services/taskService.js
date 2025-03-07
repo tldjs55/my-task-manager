@@ -2,9 +2,9 @@ import {Task} from '../models/Task.js';
 import {User} from '../models/User.js';
 
 const TASKS_LIMIT = {
-    free: 10,
-    preminum: 100,
-}
+    free: 5,
+    preminum: 10,
+};
 
 export const canCreateTask = async (userId) => {
     const user = await User.findOne({_id: userId});
@@ -12,4 +12,4 @@ export const canCreateTask = async (userId) => {
     const existingTasks = await Task.find({user: userId});
 
     return existingTasks.length < maxTasks;
-}
+};
