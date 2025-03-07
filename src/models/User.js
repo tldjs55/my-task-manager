@@ -5,6 +5,7 @@ const UserSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  plan: { type: String, enum: ["free", "premium"], default: "free" },
 });
 
 // 加密密碼

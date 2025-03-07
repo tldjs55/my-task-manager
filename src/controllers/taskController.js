@@ -1,4 +1,5 @@
 import {Task} from "../models/Task.js";
+import {canCreateTask} from "../services/taskService.js";
 
 export const createTask = async (req, res) => {
   try {
@@ -7,6 +8,10 @@ export const createTask = async (req, res) => {
 
     if (!title) {
       return res.status(400).json({ message: "Title is required" });
+    }
+
+    if (!await (canCreateTask(req.user.id))){
+      return res.status(403).json({ message: "You have reached the maximum number of tasks" });
     }
 
     // 建立 Task，並指定 user

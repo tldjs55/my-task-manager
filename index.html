@@ -231,7 +231,7 @@
         const title = document.getElementById("taskTitle").value;
 
         try {
-          await fetch(`${API_URL}/api/tasks`, {
+          response = await fetch(`${API_URL}/api/tasks`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -239,6 +239,13 @@
             },
             body: JSON.stringify({ title }),
           });
+
+          const data = await response.json();
+          console.log(data);
+          if (!response.ok) {
+            alert(data.message || "Failed to create task");
+            return;
+          }
           document.getElementById("taskTitle").value = "";
           loadTasks();
         } catch (error) {
