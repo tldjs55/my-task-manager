@@ -1,5 +1,5 @@
-import {User} from "../models/User.js";
-import jwt from 'jsonwebtoken';
+import { User } from "../models/User.js";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
 export const register = async (req, res) => {
@@ -11,7 +11,8 @@ export const register = async (req, res) => {
   User.create({
     username,
     email,
-    password});
+    password,
+  });
   res.json({ message: "User registered" });
 };
 

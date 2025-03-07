@@ -49,9 +49,7 @@ export const deleteTask = async (req, res) => {
     const task = await Task.findOne({ _id: id, user: req.user.id });
 
     if (!task) {
-      return res
-        .status(404)
-        .json({ message: "Task not found or unauthorized" });
+      return res.status(404).json({ message: "Task not found or unauthorized" });
     }
 
     await task.deleteOne();

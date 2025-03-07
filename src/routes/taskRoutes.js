@@ -1,6 +1,11 @@
 import express from "express";
-import {createTask, getTasks, updateTask, deleteTask,} from "../controllers/taskController.js";
-import {authMiddleware} from "../middlewares/authMiddleware.js";
+import {
+  createTask,
+  getTasks,
+  updateTask,
+  deleteTask,
+} from "../controllers/taskController.js";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
